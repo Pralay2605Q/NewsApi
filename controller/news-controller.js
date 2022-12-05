@@ -1,19 +1,19 @@
 import mongoose from 'mongoose';
-import Blog from '../model/Blog';
+import News from '../model/News';
 import User from '../model/User';
-export const getAllBlogs=async(req,res,next)=>{
-    let blogs;
+export const getAllNews=async(req,res,next)=>{
+    let news;
     try {
-        blogs=await Blog.find();
+        news=await News.find();
     } catch (error) {
        return console.log(error); 
     }
-    if(!blogs){
-        return res.status(404).json({message:"No Blogs Available"});
+    if(!news){
+        return res.status(404).json({message:"No News Available"});
     }
-    return res.status(200).json({blogs});
+    return res.status(200).json({news});
 }
-export const addBlog=async(req,res,next)=>{
+export const addNews=async(req,res,next)=>{
 const {title,description,image,user}=req.body;
 let existingUser;
 try {
@@ -24,7 +24,7 @@ try {
 if(!existingUser){
     return res.status(400).json({message:"No User found"});
 }
-const blog=new Blog({
+const news=new News({
     title,
     description,
     image,
@@ -33,8 +33,8 @@ const blog=new Blog({
 try {
     const session=await mongoose.startSession();
     session.startTransaction();
-   await blog.save({session});
-   existingUser.blogs.push(blog);
+   await news.save({session});
+   existingUser.news.push(news);
    await existingUser.save({session});
    await session.commitTransaction();
 
@@ -42,15 +42,15 @@ try {
 
     return res.status(500).json({error});
 }
-return res.status(200).json({blog});
+return res.status(200).json({news});
 };
-export const updateBlog=async(req,res,next)=>{
+export const updateNews=async(req,res,next)=>{
 const {title,description}=req.body;
-const blogId=req.params.id;
-let blog;
+const newsId=req.params.id;
+let news;
 
  try {
-    blog=await Blog.findByIdAndUpdate(blogId,{
+    news=await News.findByIdAndUpdate(newsId,{
         title,
         description
         });
@@ -59,50 +59,50 @@ let blog;
     return console.log(error);
 
  }
- if (!blog) {
+ if (!news) {
     return res.status(500).json({message:"Unable to update"});
  }
- return res.status(200).json({blog});
+ return res.status(200).json({news});
 };
-export const getBlogById=async(req,res,next)=>{
+export const getNewsById=async(req,res,next)=>{
        const id=req.params.id;
-       let blog;
+       let news;
        try {
-       blog=await Blog.findById(id);
+       news=await News.findById(id);
        } catch (error) {
         return console.log(error);
        }
-    if(!blog){
-        return res.status(404).json({message:"No Blog Found"});
+    if(!news){
+        return res.status(404).json({message:"No News Found"});
     }
-    return res.status(200).json({blog});
+    return res.status(200).json({news});
 };
 export const  deleteById=async(req,res,next)=>{
 const id=req.params.id;
-let blog;
+let news;
 try {
-    blog=await Blog.findByIdAndRemove(id).populate('user');
-    await blog.user.blogs.pull(blog);
-    await blog.user.save();
+    news=await News.findByIdAndRemove(id).populate('user');
+    await news.user.news.pull(news);
+    await news.user.save();
 } catch (error) {
     return console.log(error);
 }
-if(!blog){
-    return res.status(404).json({message:"Invalid blog"});
+if(!news){
+    return res.status(404).json({message:"Invalid news"});
 }
 return res.status(200).json({message:true});
 };
 export const getByUserId=async (req,res,next)=>{
     const userId=req.params.id;
-    let userBlogs;
+    let userNews;
     try {
-        userBlogs=await User.findById(userId).populate("blogs");
+        userNews=await User.findById(userId).populate("news");
     } catch (error) {
         return console.og(error);
         
     }
-    if(!userBlogs){
-        return res.status(404).json({message:"No Blog Found"});
+    if(!userNews){
+        return res.status(404).json({message:"No News Found"});
     }
-    return res.status(200).json({blogs:userBlogs});
+    return res.status(200).json({news:userNews});
 }

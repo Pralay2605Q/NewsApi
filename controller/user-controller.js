@@ -31,7 +31,7 @@ export const signup=async(req,res,next)=>{
         name,
         email,
         password :hashedPass,
-        blogs:[],
+        news:[],
        });
 
        try {
